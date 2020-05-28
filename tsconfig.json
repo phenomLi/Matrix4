@@ -1,0 +1,14 @@
+
+{
+    "compilerOptions": {
+        "target": "ES2015",
+        "module": "commonJS",
+        "experimentalDecorators": true,
+    },
+	"exclude": [		
+		"node_modules", "examples"
+	]
+}
+
+
+
