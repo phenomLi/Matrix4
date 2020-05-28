@@ -1,7 +1,7 @@
 
 
 module.exports = {
-    entry: './src/matrix4.ts',
+    entry: './src/matrix.ts',
     output: {
 		filename: './matrix4.js',
      	libraryTarget: 'umd'
