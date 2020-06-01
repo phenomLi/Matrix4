@@ -118,23 +118,13 @@ export const Vector3 = {
      * 向量加上一个数
      * @param v 
      * @param n 
-     * @param vOut 
      */
-    addNum(v: Vec3, n: number, vOut?: Vec3): Vec3 {
-        let dest: Vec3;
+    addNum(v: Vec3, n: number): Vec3 {
+        v[0] = v[0] + n;
+        v[1] = v[1] + n;
+        v[2] = v[2] + n;
 
-        if(vOut !== undefined) {
-            dest = vOut;
-        }
-        else {
-            dest = v;
-        }   
-
-        dest[0] = v[0] + n;
-        dest[1] = v[1] + n;
-        dest[2] = v[2] + n;
-
-        return dest;
+        return v;
     },
 
     /**
@@ -191,81 +181,51 @@ export const Vector3 = {
      * @param v
      */
     length(v: Vec3): number {
-        return Math.sqrt(v[0]**2 + v[1]**2 + v[2]**2);
+        return Math.hypot(v[0], v[1], v[2]);
     },
 
     /**
      * 单位化
      * @param v
-     * @param vOut
      */
-    normalize(v: Vec3, vOut?: Vec3): Vec3 {
-        let dest: Vec3;
-
-        if(vOut !== undefined) {
-            dest = vOut;
-        }
-        else {
-            dest = v;
-        }
-
+    normalize(v: Vec3): Vec3 {
         let len = Math.sqrt(v[0]**2 + v[1]**2 + v[2]**2);
 
         if(len !== 0) {
-            dest[0] = v[0] / len;
-            dest[1] = v[1] / len;
-            dest[2] = v[2] / len;
+            v[0] = v[0] / len;
+            v[1] = v[1] / len;
+            v[2] = v[2] / len;
         }
         else {
-            dest[0] = dest[1] = dest[2] = 0;
+            v[0] = v[1] = v[2] = 0;
         }
 
-        return dest;
+        return v;
     },
 
     /**
      * 缩放
      * @param v 
      * @param n 
-     * @param vOut 
      */
-    scale(v: Vec3, n: number, vOut: Vec3): Vec3 {
-        let dest: Vec3;
+    scale(v: Vec3, n: number): Vec3 {
+        v[0] = v[0] * n;
+        v[1] = v[1] * n;
+        v[2] = v[2] * n;
 
-        if(vOut !== undefined) {
-            dest = vOut;
-        }
-        else {
-            dest = v;
-        }
-
-        dest[0] = v[0] * n;
-        dest[1] = v[1] * n;
-        dest[2] = v[2] * n;
-
-        return dest;
+        return v;
     },
 
     /**
      * 反向
      * @param v
-     * @param vOut
      */
-    negate(v: Vec3, vOut?: Vec3): Vec3 {
-        let dest: Vec3;
+    negate(v: Vec3): Vec3 {
+        v[0] = -v[0];
+        v[1] = -v[1];
+        v[2] = -v[2];
 
-        if(vOut !== undefined) {
-            dest = vOut;
-        }
-        else {
-            dest = v;
-        }
-
-        dest[0] = -v[0];
-        dest[1] = -v[1];
-        dest[2] = -v[2];
-
-        return dest;
+        return v;
     },
 
     /**
