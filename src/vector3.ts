@@ -2,7 +2,7 @@ import { Vec3, Vec4 } from "./matrix";
 
 
 /**
- * 4 维向量
+ * 3 维向量
  */
 export const Vector3 = {
 
@@ -85,7 +85,6 @@ export const Vector3 = {
         dest[0] = v1[0] + v2[0];
         dest[1] = v1[1] + v2[1];
         dest[2] = v1[2] + v2[2];
-        dest[3] = v1[3] + v2[3];
 
         return dest;
     },
@@ -109,7 +108,6 @@ export const Vector3 = {
         dest[0] = v1[0] - v2[0];
         dest[1] = v1[1] - v2[1];
         dest[2] = v1[2] - v2[2];
-        dest[3] = v1[3] - v2[3];
 
         return dest;
     },

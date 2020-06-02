@@ -1,4 +1,4 @@
-import { Mat4, Vec3, Quat, Vec2 } from "./matrix";
+import { Mat4, Vec3, Quat, Vec2, _tempMatrix4 } from "./matrix";
 import { Vector3 } from "./vector3";
 
 
@@ -290,7 +290,8 @@ export const Matrix4 = {
     },
 
     /**
-     * 从四元数构建矩阵(TODO)
+     * (TODO)
+     * 从四元数构建矩阵
      * @param m
      * @param quat 
      */
@@ -299,21 +300,32 @@ export const Matrix4 = {
     },
 
     /**
-     * 设置位移矩阵(TODO)
+     * 设置位移矩阵
      * @param m 
      * @param v
      */
     translate(m: Mat4, v: Vec3): Mat4 {
-        let x = v[0],
-            y = v[1],
-            z = v[2];
+        _tempMatrix4[0] = 1;
+        _tempMatrix4[1] = 0;
+        _tempMatrix4[2] = 0;
+        _tempMatrix4[3] = v[0];
 
-        m[3] = m[0] * x + m[1] * y + m[2] * z + m[3];
-        m[7] = m[4] * x + m[5] * y + m[6] * z + m[7];
-        m[11] = m[8] * x + m[9] * y + m[10] * z + m[11];
-        m[15] = m[12] * x + m[13] * y + m[14] * z + m[15];
+        _tempMatrix4[4] = 0;
+        _tempMatrix4[5] = 1;
+        _tempMatrix4[6] = 0;
+        _tempMatrix4[7] = v[1];
+
+        _tempMatrix4[8] = 0;
+        _tempMatrix4[9] = 0;
+        _tempMatrix4[10] = 1;
+        _tempMatrix4[11] = v[2];
+
+        _tempMatrix4[12] = 0;
+        _tempMatrix4[13] = 0;
+        _tempMatrix4[14] = 0;
+        _tempMatrix4[15] = 1;
     
-        return m;
+        return Matrix4.multiply(_tempMatrix4, m, m);
     },
 
     /**
@@ -322,26 +334,27 @@ export const Matrix4 = {
      * @param v
      */
     scale(m: Mat4, v: Vec3): Mat4 {
-        let x = v[0],
-            y = v[1],
-            z = v[2];
+        _tempMatrix4[0] = v[0];
+        _tempMatrix4[1] = 0;
+        _tempMatrix4[2] = 0;
+        _tempMatrix4[3] = 0;
 
-        m[0] = m[0] * x;
-        m[4] = m[4] * x;
-        m[8] = m[8] * x;
-        m[12] = m[12] * x;
+        _tempMatrix4[4] = 0;
+        _tempMatrix4[5] = v[1];
+        _tempMatrix4[6] = 0;
+        _tempMatrix4[7] = 0;
 
-        m[1] = m[1] * y;
-        m[5] = m[5] * y;
-        m[9] = m[9] * y;
-        m[13] = m[13] * y;
+        _tempMatrix4[8] = 0;
+        _tempMatrix4[9] = 0;
+        _tempMatrix4[10] = v[2];
+        _tempMatrix4[11] = 0;
 
-        m[2] = m[2] * z;
-        m[6] = m[6] * z;
-        m[10] = m[10] * z;
-        m[14] = m[14] * z;
+        _tempMatrix4[12] = 0;
+        _tempMatrix4[13] = 0;
+        _tempMatrix4[14] = 0;
+        _tempMatrix4[15] = 1;
 
-        return m;
+        return Matrix4.multiply(_tempMatrix4, m, m);
     },
 
     /**
@@ -351,75 +364,32 @@ export const Matrix4 = {
      * @param axis
      */
     rotate(m: Mat4, rad: number, axis: Vec3): Mat4 {
-        // let x = axis[0],
-        //     y = axis[1],
-        //     z = axis[2];
+        let sin = Math.sin(rad),
+            cos = Math.cos(rad),
+            ncos = 1 - cos,
+            [x, y, z] = axis;
 
-        // let len = Vector3.length(axis);
-        // let s, c, t;
-        // let a00, a01, a02, a03;
-        // let a10, a11, a12, a13;
-        // let a20, a21, a22, a23;
-        // let b00, b01, b02;
-        // let b10, b11, b12;
-        // let b20, b21, b22;
+        _tempMatrix4[0] = cos * (1 - cos) * x**2;
+        _tempMatrix4[1] = ncos * x * y - sin * z;
+        _tempMatrix4[2] = ncos * x * z - sin * y;
+        _tempMatrix4[3] = 0;
 
-        // len = 1 / len;
-        // x *= len;
-        // y *= len;
-        // z *= len;
+        _tempMatrix4[4] = ncos * x * y + sin * z;
+        _tempMatrix4[5] = cos + ncos * y**2;
+        _tempMatrix4[6] = ncos * y * z - sin * x;
+        _tempMatrix4[7] = 0;
 
-        // s = Math.sin(rad);
-        // c = Math.cos(rad);
-        // t = 1 - c;
+        _tempMatrix4[8] = ncos * x * z - sin * y;
+        _tempMatrix4[9] = ncos * y * z + sin * x;
+        _tempMatrix4[10] = cos + ncos * z**2;
+        _tempMatrix4[11] = 0;
 
-        // a00 = a[0];
-        // a01 = a[1];
-        // a02 = a[2];
-        // a03 = a[3];
-        // a10 = a[4];
-        // a11 = a[5];
-        // a12 = a[6];
-        // a13 = a[7];
-        // a20 = a[8];
-        // a21 = a[9];
-        // a22 = a[10];
-        // a23 = a[11];
+        _tempMatrix4[12] = 0;
+        _tempMatrix4[13] = 0;
+        _tempMatrix4[14] = 0;
+        _tempMatrix4[15] = 1;
 
-        // // Construct the elements of the rotation matrix
-        // b00 = x * x * t + c;
-        // b01 = y * x * t + z * s;
-        // b02 = z * x * t - y * s;
-        // b10 = x * y * t - z * s;
-        // b11 = y * y * t + c;
-        // b12 = z * y * t + x * s;
-        // b20 = x * z * t + y * s;
-        // b21 = y * z * t - x * s;
-        // b22 = z * z * t + c;
-
-        // // Perform rotation-specific matrix multiplication
-        // out[0] = a00 * b00 + a10 * b01 + a20 * b02;
-        // out[1] = a01 * b00 + a11 * b01 + a21 * b02;
-        // out[2] = a02 * b00 + a12 * b01 + a22 * b02;
-        // out[3] = a03 * b00 + a13 * b01 + a23 * b02;
-        // out[4] = a00 * b10 + a10 * b11 + a20 * b12;
-        // out[5] = a01 * b10 + a11 * b11 + a21 * b12;
-        // out[6] = a02 * b10 + a12 * b11 + a22 * b12;
-        // out[7] = a03 * b10 + a13 * b11 + a23 * b12;
-        // out[8] = a00 * b20 + a10 * b21 + a20 * b22;
-        // out[9] = a01 * b20 + a11 * b21 + a21 * b22;
-        // out[10] = a02 * b20 + a12 * b21 + a22 * b22;
-        // out[11] = a03 * b20 + a13 * b21 + a23 * b22;
-
-        // if (a !== out) {
-        //     // If the source and destination differ, copy the unchanged last row
-        //     out[12] = a[12];
-        //     out[13] = a[13];
-        //     out[14] = a[14];
-        //     out[15] = a[15];
-        // }
-
-        return m;
+        return Matrix4.multiply(_tempMatrix4, m, m);
     },
 
     /**
@@ -434,12 +404,25 @@ export const Matrix4 = {
             U = Vector3.cross(up, N),
             V = Vector3.cross(N, U);
 
-        m.set([
-            U[0], V[0], N[0], eye[0],
-            U[1], V[1], N[1], eye[1],
-            U[2], V[2], N[2], eye[2],
-            0,    0,    0,    1
-        ]);
+        m[0] = U[0];
+        m[1] = V[0];
+        m[2] = N[0];
+        m[3] = eye[0];
+
+        m[4] = U[1];
+        m[5] = V[1];
+        m[6] = N[1];
+        m[7] = eye[1];
+
+        m[8] = U[2];
+        m[9] = V[2];
+        m[10] = N[2];
+        m[11] = eye[2];
+
+        m[12] = 0;
+        m[13] = 0;
+        m[14] = 0;
+        m[15] = 1;
         
         return m;
     },
