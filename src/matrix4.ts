@@ -32,39 +32,22 @@ export const Matrix4 = {
      * @param value 
      */
     set(m: Mat4, value: Mat4): Mat4 {
-        let m00 = value[0],
-            m01 = value[1],
-            m02 = value[2],
-            m03 = value[3],
-            m10 = value[4],
-            m11 = value[5],
-            m12 = value[6],
-            m13 = value[7],
-            m20 = value[8],
-            m21 = value[9],
-            m22 = value[10],
-            m23 = value[11],
-            m30 = value[12],
-            m31 = value[13],
-            m32 = value[14],
-            m33 = value[15];
-
-        m[0] = m00;
-        m[1] = m10;
-        m[2] = m20;
-        m[3] = m30;
-        m[4] = m01;
-        m[5] = m11;
-        m[6] = m21;
-        m[7] = m31;
-        m[8] = m02;
-        m[9] = m12;
-        m[10] = m22;
-        m[11] = m32;
-        m[12] = m03;
-        m[13] = m13;
-        m[14] = m23;
-        m[15] = m33;
+        m[0] = value[0];
+        m[1] = value[1];
+        m[2] = value[2];
+        m[3] = value[3];
+        m[4] = value[4];
+        m[5] = value[5];
+        m[6] = value[6];
+        m[7] = value[7];
+        m[8] = value[8];
+        m[9] = value[9];
+        m[10] = value[10];
+        m[11] = value[11];
+        m[12] = value[12];
+        m[13] = value[13];
+        m[14] = value[14];
+        m[15] = value[15];
         
         return m;
     },
