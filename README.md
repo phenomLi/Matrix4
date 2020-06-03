@@ -7,7 +7,7 @@
 包含内容：
 - **Matrix4(Mat4, Float32Array[16]): 4 * 4 矩阵（3 * 3 线性变换矩形 + 位移项）**
 - **Matrix3(Mat3, Float32Array[9]): 3 * 3 矩阵（2 * 3 线性变换矩形 + 位移项）**
-- **Vector(Vec3, Float32Array[3]): 3 * 1 向量**
-- **Vector(Vec2, Float32Array[2]): 2 * 1 向量**
+- **Vector3(Vec3, Float32Array[3]): 3 * 1 向量**
+- **Vector2(Vec2, Float32Array[2]): 2 * 1 向量**
 - **Quaternion(Quat, Float32Array[4]): 四元数（TODO）**
 - **Vec4(Float32Array[4]): 4 * 1 向量（3 * 1 向量 + 齐次坐标 w）**
