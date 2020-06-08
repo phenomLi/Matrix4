@@ -231,6 +231,75 @@ export const Matrix3 = {
     },
 
     /**
+     * 求矩阵的某个元素的代数余子式
+     * @param m 
+     * @param i 
+     * @param j 
+     */
+    factor(m: Mat3, i: number): number {
+        let d = new Float32Array(9),
+            k ,n = 0;
+
+        for(k = 0; k < m.length; k++) {
+            if(Math.abs(k - i) >= 3 && i % 3 !== k % 3) {
+                d[n] = m[k];
+                n++;
+            }
+        }
+    
+        let a11 = d[0], a12 = d[1], 
+            a21 = d[2], a22 = d[3],
+            det = a11 * a22 - a21 * a12;
+
+        return (-1)**(Math.floor(i / 3) + 1 + i % 3 + 1) * det;
+    },
+
+    /**
+     *  求矩阵行列式
+     * @param m 
+     */
+    determinant(m: Mat3): number {
+        let a11 = m[0], a12 = m[1], a13 = m[2],
+            a21 = m[3], a22 = m[4], a23 = m[5],
+            a31 = m[6], a32 = m[7], a33 = m[8];
+
+        return a11 * a22 * a33 + a12 * a23 * a31 + a13 * a21 * a32 - a13 * a22 * a31 - a12 * a21 * a33 - a11 * a23 * a32;
+    },
+
+    /**
+     * 矩阵求逆
+     * @param m 
+     * @param mOut 
+     */
+    invert(m: Mat3, mOut?: Mat3): Mat3 {
+        let dest: Mat3;
+
+        if(mOut !== undefined) {
+            dest = mOut;
+        }
+        else {
+            dest = this.create();
+        }   
+
+        const det = Matrix3.determinant(m);
+
+        dest[0] = Matrix3.factor(m, 0);
+        dest[3] = Matrix3.factor(m, 1);
+        dest[6] = Matrix3.factor(m, 2);
+
+        dest[1] = Matrix3.factor(m, 3);
+        dest[4] = Matrix3.factor(m, 4);
+        dest[7] = Matrix3.factor(m, 5);
+
+        dest[2] = Matrix3.factor(m, 6);
+        dest[5] = Matrix3.factor(m, 7);
+        dest[8] = Matrix3.factor(m, 8);
+
+        return Matrix3.multiplyNum(m, 1 / det);
+    },
+
+
+    /**
      * 设置位移矩阵
      * @param m 
      * @param v

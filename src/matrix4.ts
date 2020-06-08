@@ -289,6 +289,84 @@ export const Matrix4 = {
     },
 
     /**
+     * 求矩阵的某个元素的代数余子式
+     * @param m 
+     * @param i 
+     */
+    factor(m: Mat4, i: number): number {
+        let d = new Float32Array(9),
+            k , n = 0;
+
+        for(k = 0; k < m.length; k++) {
+            if(Math.abs(k - i) >= 4 && i % 4 !== k % 4) {
+                d[n] = m[k];
+                n++;
+            }
+        }
+    
+        let a11 = d[0], a12 = d[1], a13 = d[2],
+            a21 = d[3], a22 = d[4], a23 = d[5],
+            a31 = d[6], a32 = d[7], a33 = d[8],
+            det = a11 * a22 * a33 + a12 * a23 * a31 + a13 * a21 * a32 - a13 * a22 * a31 - a12 * a21 * a33 - a11 * a23 * a32;
+
+        return (-1)**(Math.floor(i / 4) + 1 + i % 4 + 1) * det;
+    },
+
+    /**
+     *  求矩阵行列式
+     * @param m 
+     */
+    determinant(m: Mat4): number {
+        let det = 0;
+
+        for(let i = 0; i < m.length; i++) {
+            det += m[i] * Matrix4.factor(m, i);
+        }
+
+        return det;
+    },
+
+    /**
+     * 矩阵求逆
+     * @param m 
+     * @param mOut 
+     */
+    invert(m: Mat4, mOut?: Mat4): Mat4 {
+        let dest: Mat4;
+
+        if(mOut !== undefined) {
+            dest = mOut;
+        }
+        else {
+            dest = this.create();
+        }   
+
+        const det = Matrix4.determinant(m);
+
+        dest[0] = Matrix4.factor(m, 0);
+        dest[4] = Matrix4.factor(m, 1);
+        dest[8] = Matrix4.factor(m, 2);
+        dest[12] = Matrix4.factor(m, 3);
+
+        dest[1] = Matrix4.factor(m, 4);
+        dest[5] = Matrix4.factor(m, 5);
+        dest[9] = Matrix4.factor(m, 6);
+        dest[13] = Matrix4.factor(m, 7);
+
+        dest[2] = Matrix4.factor(m, 8);
+        dest[6] = Matrix4.factor(m, 9);
+        dest[10] = Matrix4.factor(m, 10);
+        dest[14] = Matrix4.factor(m, 11);
+
+        dest[3] = Matrix4.factor(m, 12);
+        dest[7] = Matrix4.factor(m, 13);
+        dest[11] = Matrix4.factor(m, 14);
+        dest[15] = Matrix4.factor(m, 15);
+
+        return Matrix4.multiplyNum(dest, 1 / det);
+    },
+
+    /**
      * (TODO)
      * 从四元数构建矩阵
      * @param m
@@ -404,26 +482,26 @@ export const Matrix4 = {
             V = Vector3.cross(N, U);
 
         m[0] = U[0];
-        m[1] = V[0];
-        m[2] = N[0];
-        m[3] = eye[0];
+        m[1] = U[1];
+        m[2] = U[2];
+        m[3] = 0;
 
-        m[4] = U[1];
+        m[4] = V[0];
         m[5] = V[1];
-        m[6] = N[1];
-        m[7] = eye[1];
+        m[6] = V[2];
+        m[7] = 0;
 
-        m[8] = U[2];
-        m[9] = V[2];
-        m[10] = N[2];
-        m[11] = eye[2];
+        m[8] = -N[0];
+        m[9] = -N[1];
+        m[10] = -N[2];
+        m[11] = 0;
 
         m[12] = 0;
         m[13] = 0;
         m[14] = 0;
         m[15] = 1;
         
-        return m;
+        return Matrix4.translate(m, eye);
     },
     
     /**
