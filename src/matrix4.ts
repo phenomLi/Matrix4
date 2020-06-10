@@ -1,4 +1,4 @@
-import { Mat4, Vec3, Quat, Vec2, _tempMatrix4 } from "./matrix";
+import { Mat4, Vec3, Quat, _tempMatrix4, _tempMatrix3 } from "./matrix";
 import { Vector3 } from "./vector3";
 
 
@@ -472,36 +472,60 @@ export const Matrix4 = {
     /**
      * 设置视图矩阵
      * @param m 
-     * @param eye 
-     * @param dir 
-     * @param up 
+     * @param ex 
+     * @param ey 
+     * @param ez 
+     * @param dx 
+     * @param dy 
+     * @param dz 
+     * @param ux 
+     * @param uy 
+     * @param uz 
      */
-    setViewer(m: Mat4, eye: Vec3, dir: Vec3, up: Vec3) {
-        let N = Vector3.negate(Vector3.normalize(dir)),
-            U = Vector3.cross(up, N),
-            V = Vector3.cross(N, U);
+    setViewer(m: Mat4, ex: number, ey: number, ez: number, dx: number, dy: number, dz: number, ux: number, uy: number, uz: number): Mat4 {
+        let Nx, Ny, Nz, Ux, Uy, Uz, Vx, Vy, Vz, Nlen, Ulen;
+            
+        Matrix4.translate(m, new Float32Array([-ex, -ey, -ez]));
 
-        m[0] = U[0];
-        m[1] = U[1];
-        m[2] = U[2];
-        m[3] = 0;
+        Nlen = 1 / Math.hypot(dx, dy, dz);
+        Nx = dx * Nlen;
+        Ny = dy * Nlen;
+        Nz = dz * Nlen;
 
-        m[4] = V[0];
-        m[5] = V[1];
-        m[6] = V[2];
-        m[7] = 0;
+        Ux = Ny * uz - Nz * uy;
+        Uy = Nz * ux - Nx * uz;
+        Uz = Nx * uy - Ny * ux;
 
-        m[8] = -N[0];
-        m[9] = -N[1];
-        m[10] = -N[2];
-        m[11] = 0;
+        Ulen = 1 / Math.hypot(Ux, Uy, Uz);
+        Ux *= Ulen;
+        Uy *= Ulen;
+        Uz *= Ulen;
 
-        m[12] = 0;
-        m[13] = 0;
-        m[14] = 0;
-        m[15] = 1;
+        Vx = Uy * Nz - Uz * Ny;
+        Vy = Uz * Nx - Ux * Nz;
+        Vz = Ux * Ny - Uy * Nx;
+
+        _tempMatrix4[0] = Ux;
+        _tempMatrix4[1] = Uy;
+        _tempMatrix4[2] = Uz;
+        _tempMatrix4[3] = 0;
+
+        _tempMatrix4[4] = Vx;
+        _tempMatrix4[5] = Vy;
+        _tempMatrix4[6] = Vz;
+        _tempMatrix4[7] = 0;
+
+        _tempMatrix4[8] = -Nx;
+        _tempMatrix4[9] = -Ny;
+        _tempMatrix4[10] = -Nz;
+        _tempMatrix4[11] = 0;
+
+        _tempMatrix4[12] = 0;
+        _tempMatrix4[13] = 0;
+        _tempMatrix4[14] = 0;
+        _tempMatrix4[15] = 1;
         
-        return Matrix4.translate(m, eye);
+        return Matrix4.multiply(_tempMatrix4, m, m);
     },
     
     /**
@@ -511,28 +535,25 @@ export const Matrix4 = {
      * @param height 
      * @param depth 
      */
-    setOrthogonal(m: Mat4, width: Vec2, height: Vec2, depth: Vec2): Mat4 {
-        let left = width[0], right = width[1],
-            bottom = height[0], top = height[1],
-            near = depth[0], far = depth[1],
-            lr = 1 / (left - right),
-            bt = 1 / (bottom - top),
-            nf = 1 / (near - far);
+    setOrthogonal(m: Mat4, left: number, right: number, bottom: number, top: number, near: number, far: number): Mat4 {
+        let rw = 1 / (right - left),
+            rh = 1 / (top - bottom),
+            rd = 1 / (far - near);
 
-        m[0] = -2 * lr;
+        m[0] = 2 * rw;
         m[1] = 0;
         m[2] = 0;
-        m[3] = (left + right) * lr;
+        m[3] = -(left + right) * rw;
 
         m[4] = 0;
-        m[5] = -2 * bt;
+        m[5] = 2 * rh;
         m[6] = 0;
-        m[7] = (top + bottom) * bt;
+        m[7] = -(top + bottom) * rh;
 
         m[8] = 0;
         m[9] = 0;
-        m[10] = 2 * nf;
-        m[11] = (far + near) * nf;
+        m[10] = -2 * rd;
+        m[11] = -(far + near) * rd;
 
         m[12] = 0;
         m[13] = 0;
@@ -549,12 +570,9 @@ export const Matrix4 = {
      * @param height 
      * @param depth 
      */
-    setPerspective(m: Mat4, width: Vec2, height: Vec2, depth: Vec2): Mat4 {
-        let aspect = (width[1] - width[0]) / (height[1] - height[0]),
-            near = depth[0],
-            far = depth[1],
-            f = 2 * near / (height[1] - height[0]) ,
-            nf;
+    setPerspective(m: Mat4, fovy: number, aspect: number, near: number, far: number): Mat4 {
+        let f = Math.cos(fovy / 2) / Math.sin(fovy / 2),
+            rd = 1 / (far - near);
 
         m[0] = f / aspect;
         m[1] = 0;
@@ -568,20 +586,13 @@ export const Matrix4 = {
 
         m[8] = 0;
         m[9] = 0;
+        m[10] = -(far + near) * rd;
+        m[11] = -2 * far * near * rd;
 
         m[12] = 0;
         m[13] = 0;
-        m[14] = 1;
+        m[14] = -1;
         m[15] = 0;
-
-        if (far != null && far !== Infinity) {
-            nf = 1 / (near - far);
-            m[10] = (far + near) * nf;
-            m[11] = 2 * far * near * nf;
-        } else {
-            m[10] = -1;
-            m[11] = -2 * near;
-        }
 
         return m;
     }
