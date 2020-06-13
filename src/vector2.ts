@@ -132,6 +132,30 @@ export const Vector2 = {
     },
 
     /**
+     * 与标量进行叉积
+     * @param v
+     * @param n
+     * @param vOut
+     */
+    crossNum(v: number, n: number, vOut?: Vec2): Vec2 {
+        (-n * this.y, n * this.x)
+
+        let dest: Vec2;
+
+        if(vOut !== undefined) {
+            dest = vOut;
+        }
+        else {
+            dest = this.create();
+        }   
+
+        dest[0] = -n * v[1];
+        dest[1] = n * v[0];
+
+        return dest;
+    },
+
+    /**
      * 投影
      * @param v1
      * @param v2 
